@@ -1,6 +1,7 @@
 import sys
 import requests
 import argparse
+import time
 import json
 
 # Global variables
@@ -8,8 +9,10 @@ base_url = None
 tenant_name = None
 auth_url = None
 iam_base_url = None
-auth_token = None
+api_key = None
 debug = False
+auth_token = None
+token_expiration = None
 
 def generate_auth_url():
     global iam_base_url
@@ -33,12 +36,11 @@ def generate_auth_url():
         print("Error: Invalid base_url provided")
         sys.exit(1)
 
-def authenticate(api_key):
-    if auth_url is None:
-        return None
-    
+def authenticate():
+    global auth_token, token_expiration
+
     if debug:
-        print("Authenticating with API...")
+        print("Authenticating with API key...")
         
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -56,20 +58,31 @@ def authenticate(api_key):
         
         json_response = response.json()
         access_token = json_response.get('access_token')
-        
         if not access_token:
             print("Error: Access token not found in the response.")
-            return None
+            sys.exit(1)
         
+        expires_in = json_response.get('expires_in')
+        
+        if not expires_in:
+            expires_in = 600
+
+        token_expiration = time.time() + expires_in
+
         if debug:
-            print("Successfully authenticated")
-        
-        return access_token
+            print("Authenticated successfully.")
+      
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during authentication: {e}")
         sys.exit(1)
 
+def token_expired():
+    # Returns True if the token is expired or about to expire in the next 60 seconds
+    return time.time() > token_expiration - 60
 
+def renew_token():
+    if token_expired():
+        authenticate()
 
 def main():
     global base_url
@@ -78,6 +91,7 @@ def main():
     global auth_url
     global auth_token
     global iam_base_url
+    global api_key
 
     # Parse and handle various CLI flags
     parser = argparse.ArgumentParser(description='Export a CxOne scan workflow as a CSV file')
@@ -87,20 +101,17 @@ def main():
     parser.add_argument('--api_key', required=True, help='API key for authentication')
     parser.add_argument('--debug', action='store_true', help='Enable debug output')
 
+    # Set up various global variables
     args = parser.parse_args()
-    
     base_url = args.base_url
     tenant_name = args.tenant_name
     debug = args.debug
-            
     if args.iam_base_url:
         iam_base_url = args.iam_base_url
-    
+    api_key = args.api_key
     auth_url = generate_auth_url()
-    auth_token = authenticate(args.api_key)
-    
-    if auth_token is None:
-        return
+
+    authenticate()
 
 if __name__ == "__main__":
     main()
