@@ -39,7 +39,7 @@ def generate_auth_url():
 def authenticate():
 
     # if the token hasn't expired then we don't need to authenticate
-    if not token_expired():
+    if time.time() < token_expiration - 60:
         if debug:
             print("Token still valid.")
         return
@@ -81,10 +81,6 @@ def authenticate():
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during authentication: {e}")
         sys.exit(1)
-
-def token_expired():
-    # Returns True if the token is expired or about to expire in the next 60 seconds
-    return time.time() > token_expiration - 60
 
 def main():
     global base_url
