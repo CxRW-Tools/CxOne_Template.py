@@ -12,7 +12,7 @@ iam_base_url = None
 api_key = None
 debug = False
 auth_token = None
-token_expiration = None
+token_expiration = 0 # initialize so we have to authenticate
 
 def generate_auth_url():
     global iam_base_url
@@ -37,6 +37,13 @@ def generate_auth_url():
         sys.exit(1)
 
 def authenticate():
+
+    # if the token hasn't expired then we don't need to authenticate
+    if not token_expired():
+        if debug:
+            print("Token still valid.")
+        return
+    
     global auth_token, token_expiration
 
     if debug:
@@ -44,7 +51,6 @@ def authenticate():
         
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': f'Bearer {api_key}'
     }
     data = {
         'grant_type': 'refresh_token',
@@ -80,10 +86,6 @@ def token_expired():
     # Returns True if the token is expired or about to expire in the next 60 seconds
     return time.time() > token_expiration - 60
 
-def renew_token():
-    if token_expired():
-        authenticate()
-
 def main():
     global base_url
     global tenant_name
@@ -112,6 +114,24 @@ def main():
     auth_url = generate_auth_url()
 
     authenticate()
+
+    from datetime import datetime
+    iterations = 45
+    for i in range(iterations):
+        # Sleep for 5 minutes
+        print(f"Sleeping for 1 minute. Iteration: {i+1}/{iterations}")
+        time.sleep(60)  # 300 seconds
+
+        # Print the current time
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Current time: {formatted_time}")
+
+        authenticate()
+
+
+
+
 
 if __name__ == "__main__":
     main()
