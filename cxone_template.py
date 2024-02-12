@@ -4,15 +4,15 @@ import argparse
 import time
 import json
 
-# Global variables
+# Standard global variables
 base_url = None
 tenant_name = None
 auth_url = None
 iam_base_url = None
 api_key = None
-debug = False
 auth_token = None
 token_expiration = 0 # initialize so we have to authenticate
+debug = False
 
 def generate_auth_url():
     global iam_base_url
@@ -37,6 +37,7 @@ def generate_auth_url():
         sys.exit(1)
 
 def authenticate():
+    global auth_token, token_expiration
 
     # if the token hasn't expired then we don't need to authenticate
     if time.time() < token_expiration - 60:
@@ -44,8 +45,6 @@ def authenticate():
             print("Token still valid.")
         return
     
-    global auth_token, token_expiration
-
     if debug:
         print("Authenticating with API key...")
         
@@ -63,8 +62,8 @@ def authenticate():
         response.raise_for_status()
         
         json_response = response.json()
-        access_token = json_response.get('access_token')
-        if not access_token:
+        auth_token = json_response.get('access_token')
+        if not auth_token:
             print("Error: Access token not found in the response.")
             sys.exit(1)
         
