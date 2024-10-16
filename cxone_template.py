@@ -110,23 +110,5 @@ def main():
 
     authenticate()
 
-    from datetime import datetime
-    iterations = 45
-    for i in range(iterations):
-        # Sleep for 5 minutes
-        print(f"Sleeping for 1 minute. Iteration: {i+1}/{iterations}")
-        time.sleep(60)  # 300 seconds
-
-        # Print the current time
-        current_time = datetime.now()
-        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"Current time: {formatted_time}")
-
-        authenticate()
-
-
-
-
-
 if __name__ == "__main__":
     main()
