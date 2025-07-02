@@ -92,10 +92,10 @@ def main():
 
     # Parse and handle various CLI flags
     parser = argparse.ArgumentParser(description='Export a CxOne scan workflow as a CSV file')
-    parser.add_argument('--base_url', required=True, help='Region Base URL')
-    parser.add_argument('--iam_base_url', required=False, help='Region IAM Base URL')
-    parser.add_argument('--tenant_name', required=True, help='Tenant name')
-    parser.add_argument('--api_key', required=True, help='API key for authentication')
+    parser.add_argument('--base-url', required=True, help='Region Base URL')
+    parser.add_argument('--iam-base-url', required=False, help='Region IAM Base URL')
+    parser.add_argument('--tenant-name', required=True, help='Tenant name')
+    parser.add_argument('--api-key', required=True, help='API key for authentication')
     parser.add_argument('--debug', action='store_true', help='Enable debug output')
 
     # Set up various global variables

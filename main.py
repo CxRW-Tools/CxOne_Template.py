@@ -14,9 +14,9 @@ from src.utils.config import Config
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='CxOne Tool Template')
-    parser.add_argument('--base_url', help='Region Base URL')
-    parser.add_argument('--tenant_name', help='Tenant name')
-    parser.add_argument('--api_key', help='API key for authentication')
+    parser.add_argument('--base-url', help='Region Base URL')
+    parser.add_argument('--tenant-name', help='Tenant name')
+    parser.add_argument('--api-key', help='API key for authentication')
     parser.add_argument('--debug', action='store_true', help='Enable debug output')
     return parser.parse_args()
 
